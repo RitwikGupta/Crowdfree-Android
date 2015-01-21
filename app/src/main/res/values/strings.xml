@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Crowdfree</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+    <string name="chipotle">Chipotle</string>
+    <string name="union">Union</string>
+    <string name="starbucks">Starbucks</string>
+    <string name="title_activity_crowd">CrowdActivity</string>
+    <string name="crowd_label">The crowd level is:</string>
+    <string name="crowd_submit">Submit crowd level</string>
+
+</resources>
