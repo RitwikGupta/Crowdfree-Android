@@ -1,5 +1,6 @@
 package ritwikgupta.me.crowdfree;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -11,19 +12,12 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.DefaultHttpClient;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.Random;
 import java.util.concurrent.ExecutionException;
 
 
@@ -46,9 +40,9 @@ public class CrowdActivity extends ActionBarActivity {
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Random rand = new Random();
-                int randInt = rand.nextInt((3-1) + 1) + 1;
-                new QueryServerPOST().execute("http://192.168.1.160:4567/upload/" + place, "" + randInt);
+                Intent intent = new Intent(getBaseContext(), SubmitActivity.class);
+                intent.putExtra("place", place);
+                startActivityForResult(intent, 1);
             }
         });
 
@@ -87,6 +81,14 @@ public class CrowdActivity extends ActionBarActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        // Check which request we're responding to
+        if (requestCode == 1) {
+            Toast.makeText(getBaseContext(), "Level submitted", Toast.LENGTH_LONG).show();
+        }
     }
 
     private class QueryServerGET extends AsyncTask<String, Void, String>{
@@ -151,25 +153,6 @@ public class CrowdActivity extends ActionBarActivity {
             char[] buffer = new char[len];
             reader.read(buffer);
             return new String(buffer);
-        }
-    }
-
-    private class QueryServerPOST extends AsyncTask<String, Void, Void>{
-        protected Void doInBackground(String... params) {
-            // Create a new HttpClient and Post Header
-            HttpClient httpclient = new DefaultHttpClient();
-            HttpPost httppost = new HttpPost(params[0]);
-
-            try {
-                httppost.setEntity(new StringEntity(params[1]));
-
-                // Execute HTTP Post Request
-                HttpResponse response = httpclient.execute(httppost);
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-            return null;
         }
     }
 }

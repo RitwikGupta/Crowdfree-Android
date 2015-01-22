@@ -10,5 +10,6 @@
     <string name="title_activity_crowd">CrowdActivity</string>
     <string name="crowd_label">The crowd level is:</string>
     <string name="crowd_submit">Submit crowd level</string>
+    <string name="title_activity_submit">SubmitActivity</string>
 
 </resources>
