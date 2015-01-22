@@ -11,13 +11,19 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.DefaultHttpClient;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
-import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Random;
 import java.util.concurrent.ExecutionException;
 
 
@@ -32,18 +38,29 @@ public class CrowdActivity extends ActionBarActivity {
 
         place = getIntent().getStringExtra("place");
 
+        setTitle(place.toUpperCase());
+
         TextView level = (TextView) findViewById(R.id.crowd_leveltext);
         Button submit = (Button) findViewById(R.id.crowd_submit);
 
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                Random rand = new Random();
+                int randInt = rand.nextInt((3-1) + 1) + 1;
+                new QueryServerPOST().execute("http://192.168.1.160:4567/upload/" + place, "" + randInt);
             }
         });
 
         try {
-            level.setText(new QueryServerGET().execute("http://url/" + place).get());
+            Integer levelStress = Integer.parseInt(new QueryServerGET().execute("http://192.168.1.160:4567/" + place).get().substring(0,1));
+            if(levelStress == 1){
+                level.setText("LOW");
+            } else if(levelStress == 2){
+                level.setText("MEDIUM");
+            } else {
+                level.setText("HIGH");
+            }
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();
         }
@@ -116,8 +133,7 @@ public class CrowdActivity extends ActionBarActivity {
                 is = conn.getInputStream();
 
                 // Convert the InputStream into a string
-                String contentAsString = readIt(is, len);
-                return contentAsString;
+                return readIt(is, len);
 
                 // Makes sure that the InputStream is closed after the app is
                 // finished using it.
@@ -129,12 +145,31 @@ public class CrowdActivity extends ActionBarActivity {
         }
 
         // Reads an InputStream and converts it to a String.
-        public String readIt(InputStream stream, int len) throws IOException, UnsupportedEncodingException {
-            Reader reader = null;
+        public String readIt(InputStream stream, int len) throws IOException {
+            Reader reader;
             reader = new InputStreamReader(stream, "UTF-8");
             char[] buffer = new char[len];
             reader.read(buffer);
             return new String(buffer);
+        }
+    }
+
+    private class QueryServerPOST extends AsyncTask<String, Void, Void>{
+        protected Void doInBackground(String... params) {
+            // Create a new HttpClient and Post Header
+            HttpClient httpclient = new DefaultHttpClient();
+            HttpPost httppost = new HttpPost(params[0]);
+
+            try {
+                httppost.setEntity(new StringEntity(params[1]));
+
+                // Execute HTTP Post Request
+                HttpResponse response = httpclient.execute(httppost);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return null;
         }
     }
 }
