@@ -1,5 +1,6 @@
 package ritwikgupta.me.crowdfree;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -47,7 +48,7 @@ public class CrowdActivity extends ActionBarActivity {
         });
 
         try {
-            Integer levelStress = Integer.parseInt(new QueryServerGET().execute("http://192.168.1.160:4567/" + place).get().substring(0,1));
+            Integer levelStress = Integer.parseInt(new QueryServerGET().execute("http://162.243.206.135:4567/" + place).get().substring(0,1));
             if(levelStress == 1){
                 level.setText("LOW");
             } else if(levelStress == 2){
@@ -87,7 +88,9 @@ public class CrowdActivity extends ActionBarActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         // Check which request we're responding to
         if (requestCode == 1) {
-            Toast.makeText(getBaseContext(), "Level submitted", Toast.LENGTH_LONG).show();
+            if (resultCode == Activity.RESULT_OK) {
+                Toast.makeText(getBaseContext(), "Level submitted", Toast.LENGTH_LONG).show();
+            }
         }
     }
 
@@ -109,7 +112,6 @@ public class CrowdActivity extends ActionBarActivity {
         }
 
         protected void onPostExecute(String result){
-            Toast.makeText(getApplicationContext(), page, Toast.LENGTH_LONG).show();
         }
 
         // Given a URL, establishes an HttpUrlConnection and retrieves

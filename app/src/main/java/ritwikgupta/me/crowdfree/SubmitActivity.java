@@ -1,5 +1,7 @@
 package ritwikgupta.me.crowdfree;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -8,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -25,16 +28,26 @@ public class SubmitActivity extends ActionBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_submit);
 
+        setTitle("Submit");
+
         final EditText edit = (EditText) findViewById(R.id.submit_edit);
-        Button submit = (Button) findViewById(R.id.crowd_submit);
+        Button submit = (Button) findViewById(R.id.submit_submit);
         final String place = getIntent().getStringExtra("place");
+
 
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 int number = Integer.parseInt(edit.getText().toString());
-                new QueryServerPOST().execute("http://192.168.1.160:4567/upload/" + place , "" + number);
-                finish();
+                if(number < 1 || number > 3){
+                    Toast.makeText(getBaseContext(), "Invalid number, please use 1-3", Toast.LENGTH_LONG).show();
+                    edit.setText("");
+                } else {
+                    new QueryServerPOST().execute("http://162.243.206.135:4567/upload/" + place, "" + number);
+                    Intent resultIntent = new Intent();
+                    setResult(Activity.RESULT_OK, resultIntent);
+                    finish();
+                }
             }
         });
     }
